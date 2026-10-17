@@ -7,7 +7,8 @@ fantasy_names = [
     "Shrek", "Donkey", "Swamp",
     "Eragon", "Varden", "Uragals", "Ra'zac", "Murtagh"
     "Diago", "Caten", "Res", "Luceum", "Obiteum"
-    "Eldrazi", "Kor", "Fae"]
+    "Eldrazi", "Kor", "Fae"
+]
 
 # Add more options to vary the game slightly
 weapon_types = [
