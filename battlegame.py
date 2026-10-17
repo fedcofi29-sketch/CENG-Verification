@@ -10,11 +10,31 @@ class Player:
             # Idk if this might be p5 instead so maybe print isn't best
             print('That is too expensive')
         else:
-            pass
+            self.money -= item.cost
+            self.equipment.append(item)
     
 
 class Item:
-    def __init__(self, type, cost, stats):
+    def __init__(self, name, type, cost, stats):
+        self.name = name
         self.type = type
         self.cost = cost
         self.stats = stats
+
+# Idk if some of these are copyright but they're interchangeable w/ other names
+fantasy_names = [
+    "Aragorn", "Frodo", "Bilbo", "Thranduill"
+    "Shrek", "Donkey", "Swamp",
+    "Eragon", "Varden", "Uragals", "Ra'zac", "Murtagh"
+    "Diago", "Caten", "Res", "Luceum", "Obiteum"
+    "Eldrazi", "Kor", "Fae"]
+
+# Add more options to vary the game slightly
+weapon_types = [
+    "Sword", "Bow", "Spear", "Mace"
+]
+
+# Add more options to vary the game slightly
+armor_types = [
+    "Helmet", "Boots", "Chestplate", "Leggings", "Shield"
+]
