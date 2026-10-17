@@ -1,3 +1,5 @@
+import random
+
 class Player:
     def __init__(self, hp, strength, money):
         self.health = hp
@@ -38,3 +40,38 @@ weapon_types = [
 armor_types = [
     "Helmet", "Boots", "Chestplate", "Leggings", "Shield"
 ]
+
+shop_items = []
+
+def create_shop_items():
+    for i in range(0, 3):
+        name = random.choice(fantasy_names)
+        type = random.randint(1, 2)
+        if type == 1:
+            type = 'weapon'
+            subName = random.choice(weapon_types)            
+        elif type == 2:
+            type = 'armor'
+            subName = random.choice(armor_types)
+        name = f"{subName} of {name}"
+
+        odds = random.randint(0, 100)
+        # 40% chance of 1, 30% of 2, 20% of 3, 10% of 4
+        if odds >= 40:
+            stats = 1
+        elif odds >= 70:
+            stats = 2
+        elif odds >= 90:
+            stats = 3
+        else:
+            stats = 4
+
+        cost = stats + random.randint(-1, 3)
+
+        newItem = Item(name, type, cost, stats)
+        shop_items.append(newItem)
+
+
+create_shop_items()
+for item in shop_items:
+    print(item.name, item.type, item.cost, item.stats)
