@@ -24,7 +24,7 @@ armor_types = [
 shop_items = []
 locations = []
 background_colors = [
-    {"location": "outdoors",
+    {"location": "Outdoors",
      "r": 0, "g": 50, "b": 10
     }
 ]
@@ -54,7 +54,7 @@ class Player:
             "left": False,
             "right": False
         }
-        self.map = "outdoors"
+        self.map = "Outdoors"
         
 
 
@@ -117,6 +117,8 @@ class Player:
                 vertical_hit = location.position.y <= i <= location.position.y + location.h
                 if high_x_hit or low_x_hit:
                     horizontal_hit = True
+                else:
+                    horizontal_hit = False
                 # Means at least one point of the circle edge is within the shop frame
                 if vertical_hit and horizontal_hit:
                     self.map = location.name
@@ -235,9 +237,13 @@ def draw():
     render_backdrop()
     jimmy.render()
     jimmy.move()
-    if jimmy.map == "outdoors":
+    if jimmy.map == "Outdoors":
         for place in locations:
             place.render()
             jimmy.enter_location(place)
+    if jimmy.map == "Shop":
+        for item in shop_items:
+            x_cord = screen_width*((shop_items.index(item)+1)/4)
+            text(item.name, x_cord, 40)
     
 run()
