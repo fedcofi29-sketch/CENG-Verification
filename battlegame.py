@@ -32,15 +32,15 @@ class Player:
         self.equipment = []
         self.money = money
         # I'm just doing a circle for the player for now
-        self.pos = (20, 20)
+        self.position = Vector(20, 20)
         # Circle draws w/ diameter but its easier for other references to store w/ radius
-        self.r = 20
+        self.r = 10
         # Only ever one player so this is just hardcoded
         # Can either use WASD or arrow keys
-        self.up_key = ["W", 'UP']
-        self.down_key = ["S", 'DOWN']
-        self.left_key = ["A", 'LEFT']
-        self.right_key = ["D", 'RIGHT']
+        self.up_key = ["W", 'UP', "w", "up"]
+        self.down_key = ["S", 'DOWN', "s", "down"]
+        self.left_key = ["A", 'LEFT', 'a', 'left']
+        self.right_key = ["D", 'RIGHT', 'd', 'right']
 
         self.moving = {
             "up": False,
@@ -52,46 +52,46 @@ class Player:
 
 
     def render(self):
-        fill('red')
-        circle(self.pos, self.r * 2)
+        fill('gray')
+        circle(self.position, self.r * 2)
 
     # Key presseed / released allows click hold
     def handlekeypressed(self, k):
-        if k.upper() in self.up_key:
+        if k in self.up_key:
             self.moving['up'] = True
-        elif k.upper() in self.down_key:
+        elif k in self.down_key:
             self.moving['down'] = True
-        elif k.upper() in self.left_key:
+        elif k in self.left_key:
             self.moving['left'] = True
-        elif k.upper() in self.right_key:
+        elif k in self.right_key:
             self.moving['right'] = True
 
     def handlekeyreleased(self, k): 
-        if k.upper() in self.up_key:
+        if k in self.up_key:
             self.moving['up'] = False
-        elif k.upper() in self.down_key:
+        elif k in self.down_key:
             self.moving['down'] = False
-        elif k.upper() in self.left_key:
+        elif k in self.left_key:
             self.moving['left'] = False
-        elif k.upper() in self.right_key:
+        elif k in self.right_key:
             self.moving['right'] = False
 
     def move(self):
         # The +/- of up/down are inversed since 0 is the top of p5 coordinates
         if self.moving['up']:
-            self.position.y -= 5
+            self.position.y -= 1.5
             if self.position.y - self.r <= 0:
                 self.position.y = 0 + self.r
         if self.moving['down']:
-            self.position.y += 5
+            self.position.y += 1.5
             if self.position.y + self.r >= screen_height:
                 self.position.y = screen_height - self.r
         if self.moving['left']:
-            self.position.x -= 5
+            self.position.x -= 1.5
             if self.position.x - self.r <= 0:
                 self.position.x = 0 + self.r
         if self.moving['right']:
-            self.position.x += 5
+            self.position.x += 1.5
             if self.position.x + self.r >= screen_width:
                 self.position.x = screen_width - self.r
 
@@ -126,6 +126,11 @@ class Location:
         text(self.name, self.position.x + 10, self.position.y)
 
 
+def key_pressed(evt):
+    jimmy.handlekeypressed(evt.key)
+
+def key_released(evt):
+    jimmy.handlekeyreleased(evt.key.name)
 
 def create_shop_items():
     for i in range(0, 3):
@@ -164,6 +169,8 @@ jimmy = Player(1, 1, 1)
 pos = Vector(100, 200)
 shop = Location(pos, 80, 40, 'Shop')
 
+def render_backdrop():
+    background(0, 50, 10)
 
 def setup():
     size(screen_width, screen_height)
@@ -171,6 +178,7 @@ def setup():
     text_font(arial)
 
 def draw():
+    render_backdrop()
     jimmy.render()
     jimmy.move()
     shop.render()
