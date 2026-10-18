@@ -33,11 +33,67 @@ class Player:
         self.money = money
         # I'm just doing a circle for the player for now
         self.pos = (20, 20)
+        # Circle draws w/ diameter but its easier for other references to store w/ radius
         self.r = 20
+        # Only ever one player so this is just hardcoded
+        # Can either use WASD or arrow keys
+        self.up_key = ["W", 'UP']
+        self.down_key = ["S", 'DOWN']
+        self.left_key = ["A", 'LEFT']
+        self.right_key = ["D", 'RIGHT']
+
+        self.moving = {
+            "up": False,
+            "down": False,
+            "left": False,
+            "right": False
+        }
+        
 
 
     def render(self):
-        circle(self.pos, self.r)
+        fill('red')
+        circle(self.pos, self.r * 2)
+
+    # Key presseed / released allows click hold
+    def handlekeypressed(self, k):
+        if k.upper() in self.up_key:
+            self.moving['up'] = True
+        elif k.upper() in self.down_key:
+            self.moving['down'] = True
+        elif k.upper() in self.left_key:
+            self.moving['left'] = True
+        elif k.upper() in self.right_key:
+            self.moving['right'] = True
+
+    def handlekeyreleased(self, k): 
+        if k.upper() in self.up_key:
+            self.moving['up'] = False
+        elif k.upper() in self.down_key:
+            self.moving['down'] = False
+        elif k.upper() in self.left_key:
+            self.moving['left'] = False
+        elif k.upper() in self.right_key:
+            self.moving['right'] = False
+
+    def move(self):
+        # The +/- of up/down are inversed since 0 is the top of p5 coordinates
+        if self.moving['up']:
+            self.position.y -= 5
+            if self.position.y - self.r <= 0:
+                self.position.y = 0 + self.r
+        if self.moving['down']:
+            self.position.y += 5
+            if self.position.y + self.r >= screen_height:
+                self.position.y = screen_height - self.r
+        if self.moving['left']:
+            self.position.x -= 5
+            if self.position.x - self.r <= 0:
+                self.position.x = 0 + self.r
+        if self.moving['right']:
+            self.position.x += 5
+            if self.position.x + self.r >= screen_width:
+                self.position.x = screen_width - self.r
 
     def purchase(self, item):
         if self.money < item.cost:
@@ -54,6 +110,20 @@ class Item:
         self.type = type
         self.cost = cost
         self.stats = stats
+
+class Location:
+    def __init__(self, position, width, height, name):
+        self.position = position
+        self.width = width
+        self.height = height
+        self.name = name
+
+    def render(self):
+        # colors are arbitrary. just wanted to confirm text was there
+        fill('white')
+        rect((self.position), self.width, self.height)
+        fill('black')
+        text(self.name, self.position.x + 10, self.position.y)
 
 
 
@@ -91,11 +161,18 @@ for item in shop_items:
     print(item.name, item.type, item.cost, item.stats)
 
 jimmy = Player(1, 1, 1)
+pos = Vector(100, 200)
+shop = Location(pos, 80, 40, 'Shop')
+
 
 def setup():
     size(screen_width, screen_height)
+    arial = create_font("arial.ttf")
+    text_font(arial)
 
 def draw():
     jimmy.render()
+    jimmy.move()
+    shop.render()
     
 run()
