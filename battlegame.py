@@ -4,10 +4,10 @@ import math
 
 # Idk if some of these are copyright but they're interchangeable w/ other names
 fantasy_names = [
-    "Aragorn", "Frodo", "Bilbo", "Thranduill"
+    "Aragorn", "Frodo", "Bilbo", "Thranduill",
     "Shrek", "Donkey", "Swamp",
-    "Eragon", "Varden", "Uragals", "Ra'zac", "Murtagh"
-    "Diago", "Caten", "Res", "Luceum", "Obiteum"
+    "Eragon", "Varden", "Uragals", "Ra'zac", "Murtagh",
+    "Diago", "Caten", "Res", "Luceum", "Obiteum",
     "Eldrazi", "Kor", "Fae"
 ]
 
@@ -166,8 +166,10 @@ class Location:
         # colors are arbitrary. just wanted to confirm text was there
         fill('white')
         rect((self.position), self.w, self.h)
+        text_size(15)
         fill('black')
-        text(self.name, self.position.x + 10, self.position.y)
+        text(self.name, self.position.x + (self.w/2), self.position.y)
+        no_stroke()
 
 
 def key_pressed(evt):
@@ -204,16 +206,33 @@ def create_shop_items():
         newItem = Item(name, type, cost, stats)
         shop_items.append(newItem)
 
+def render_diff_maps():
+    if jimmy.map == "Outdoors":
+        outdoor_map()
+    if jimmy.map == "Shop":
+        shop_map()
+
+def outdoor_map():
+    for place in locations:
+        place.render()
+        jimmy.enter_location(place)
+
+def shop_map():
+    for item in shop_items:
+        y_cord = screen_height*((shop_items.index(item)+1)/4) - 20
+        fill('black')
+        text_size(20)
+        text(f"{item.name}, {item.cost} coins, {item.stats} buff", screen_width*3/5, y_cord)
+    text(f"Balance: {jimmy.money} coins", 100, 30)
 
         
 create_shop_items()
-for item in shop_items:
-    print(item.name, item.type, item.cost, item.stats)
+
 
 jimmy = Player(1, 1, 1)
 # Probably will have this generate randomly in future
 pos = Vector(100, 200)
-shop = Location(pos, 80, 40, 'Shop', 255, 255, 255)
+shop = Location(pos, 120, 60, 'Shop', 255, 255, 255)
 locations.append(shop)
 background_colors.append({
     'location': shop.name,
@@ -226,6 +245,7 @@ def render_backdrop():
     for place in background_colors:
         if place['location'] == jimmy.map:
             background(place['r'], place['g'], place['b'])
+    text_align(align_x=CENTER)
     
 
 def setup():
@@ -237,13 +257,7 @@ def draw():
     render_backdrop()
     jimmy.render()
     jimmy.move()
-    if jimmy.map == "Outdoors":
-        for place in locations:
-            place.render()
-            jimmy.enter_location(place)
-    if jimmy.map == "Shop":
-        for item in shop_items:
-            x_cord = screen_width*((shop_items.index(item)+1)/4)
-            text(item.name, x_cord, 40)
+    render_diff_maps()
+    
     
 run()
