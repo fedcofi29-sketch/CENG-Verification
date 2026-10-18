@@ -1,5 +1,6 @@
 from p5 import *
 import random
+import math
 
 # Idk if some of these are copyright but they're interchangeable w/ other names
 fantasy_names = [
@@ -21,6 +22,12 @@ armor_types = [
 ]
 
 shop_items = []
+locations = []
+background_colors = [
+    {"location": "outdoors",
+     "r": 0, "g": 50, "b": 10
+    }
+]
 
 screen_width = 600
 screen_height = 400
@@ -41,13 +48,13 @@ class Player:
         self.down_key = ["S", 'DOWN', "s", "down"]
         self.left_key = ["A", 'LEFT', 'a', 'left']
         self.right_key = ["D", 'RIGHT', 'd', 'right']
-
         self.moving = {
             "up": False,
             "down": False,
             "left": False,
             "right": False
         }
+        self.map = "outdoors"
         
 
 
@@ -95,6 +102,38 @@ class Player:
             if self.position.x + self.r >= screen_width:
                 self.position.x = screen_width - self.r
 
+    # This is repurposed from a pong variant I made
+    # It checks whether a circle overlaps w/ a rectangle
+    def enter_location(self, location):   
+        bottom = round(self.position.y - self.r)
+        top = round(self.position.y + self.r)
+        for i in range(bottom, top): # This passes through each y value in the player
+            # This function returns where the edges of the circle are at that y value
+            # The moment an edge touches the location, the player counts as entered
+            high_x, low_x = self.each_point_on_circle(i)
+            if high_x != 0 and low_x != 0: # The function returns 0 as a spillway for errors
+                high_x_hit = location.position.x + location.w > high_x >= location.position.x
+                low_x_hit = location.position.x < low_x <= location.position.x + location.w
+                vertical_hit = location.position.y <= i <= location.position.y + location.h
+                if high_x_hit or low_x_hit:
+                    horizontal_hit = True
+                # Means at least one point of the circle edge is within the shop frame
+                if vertical_hit and horizontal_hit:
+                    self.map = location.name
+
+# Also from my pong game
+    def each_point_on_circle(self, i):
+        # circ_equation: r^2 = (x - h)^2 + (y - k)^2
+        xminush_squared = self.r**2 - (i - self.position.y)**2
+        if xminush_squared > 0: # Not sure how negatives appear, but the code crashes without this line
+            position_xminush = math.sqrt(xminush_squared)
+            neg_xminush = math.sqrt(xminush_squared)*-1 # I realized .sqrt only returns positive root not both
+            pos_x = position_xminush + self.position.x
+            neg_x = neg_xminush + self.position.x
+            return pos_x, neg_x
+        else:
+            return 0, 0 # fallback if negatives somehow come up
+
     def purchase(self, item):
         if self.money < item.cost:
             # Idk if this might be p5 instead so maybe print isn't best
@@ -112,16 +151,19 @@ class Item:
         self.stats = stats
 
 class Location:
-    def __init__(self, position, width, height, name):
+    def __init__(self, position, width, height, name, r, g, b):
         self.position = position
-        self.width = width
-        self.height = height
+        self.w = width
+        self.h = height
         self.name = name
+        self.r = r
+        self.g = g
+        self.b = b
 
     def render(self):
         # colors are arbitrary. just wanted to confirm text was there
         fill('white')
-        rect((self.position), self.width, self.height)
+        rect((self.position), self.w, self.h)
         fill('black')
         text(self.name, self.position.x + 10, self.position.y)
 
@@ -161,16 +203,28 @@ def create_shop_items():
         shop_items.append(newItem)
 
 
+        
 create_shop_items()
 for item in shop_items:
     print(item.name, item.type, item.cost, item.stats)
 
 jimmy = Player(1, 1, 1)
+# Probably will have this generate randomly in future
 pos = Vector(100, 200)
-shop = Location(pos, 80, 40, 'Shop')
+shop = Location(pos, 80, 40, 'Shop', 255, 255, 255)
+locations.append(shop)
+background_colors.append({
+    'location': shop.name,
+    'r': shop.r,
+    'g': shop.g,
+    'b': shop.b
+})
 
 def render_backdrop():
-    background(0, 50, 10)
+    for place in background_colors:
+        if place['location'] == jimmy.map:
+            background(place['r'], place['g'], place['b'])
+    
 
 def setup():
     size(screen_width, screen_height)
@@ -181,6 +235,9 @@ def draw():
     render_backdrop()
     jimmy.render()
     jimmy.move()
-    shop.render()
+    if jimmy.map == "outdoors":
+        for place in locations:
+            place.render()
+            jimmy.enter_location(place)
     
 run()
